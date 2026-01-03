@@ -164,8 +164,11 @@ elif section == "Classification":
         fused_automl_df = pd.read_csv("outputs/fused_cls_automl.csv")
         st.dataframe(fused_automl_df, use_container_width=True)
 
+        fused_automl_df = pd.read_csv("outputs/cls_manual_automl_compare.csv")
+        st.dataframe(fused_automl_df, use_container_width=True)
+
         labels = ["Grid Search (XGBoost)", "AutoML (LightGBM)"]
-        f1_vals = [0.6815, 0.679750]
+        f1_vals = [0.6815,0.67975]
 
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
