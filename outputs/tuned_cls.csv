@@ -1,0 +1,7 @@
+﻿Tuned Model,Accuracy,F1-Score
+ANN Grid,0.6777,0.6722
+ANN Random,0.6695,0.6531
+XGB Grid,0.6911,0.6815
+XGB Random,0.6882,0.6737
+SVM Grid,0.6836,0.6723
+SVM Random,0.6836,0.6723

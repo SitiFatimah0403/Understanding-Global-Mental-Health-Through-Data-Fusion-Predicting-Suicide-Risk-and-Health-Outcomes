@@ -1,0 +1,3 @@
+﻿Type of Modeling,F1-Score
+Manual Modeling (XGBoost),0.6815
+AutoML (LightGBM),0.67975

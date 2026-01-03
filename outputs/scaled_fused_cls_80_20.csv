@@ -1,0 +1,9 @@
+﻿Model,Accuracy,F1-Score
+Decision Tree,0.640681,0.595948
+Random Forest,0.640026,0.618005
+Logistic Regression,0.627907,0.629967
+Naive Bayes,0.552899,0.367177
+KNN,0.624959,0.610146
+SVM,0.671471,0.658262
+XGBoost,0.655748,0.635196
+MLPClassifier (ANN),0.676384,0.650142
