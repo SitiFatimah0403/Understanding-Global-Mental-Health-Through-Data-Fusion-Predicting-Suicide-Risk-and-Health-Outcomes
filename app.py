@@ -56,14 +56,14 @@ if section == "Classification":
 
     f1_fused = [0.658262, 0.642985, 0.658356, 0.643151]
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(4, 3)) 
     ax.bar(labels_fused, f1_fused)
     ax.set_ylabel("F1 Score")
     ax.set_title("Fused Dataset: F1 Comparison (80–20 vs 70–30)")
     ax.set_ylim(0.6, 0.7)
     plt.xticks(rotation=20)
 
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=False)
 
     
     # Hyperparameter Tuning
@@ -82,7 +82,7 @@ if section == "Classification":
     x = np.arange(len(models_fused))
     width = 0.35
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(4, 3))  
     ax.bar(x - width/2, grid_f1_fused, width, label="Grid Search")
     ax.bar(x + width/2, random_f1_fused, width, label="Random Search")
 
@@ -93,7 +93,7 @@ if section == "Classification":
     ax.legend()
     ax.set_ylim(0.64, 0.70)
 
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=False)
 
 
     # AutoML Comparison
@@ -110,13 +110,13 @@ if section == "Classification":
     labels_fused = ["Grid Search (XGBoost)", "AutoML (LightGBM)"]
     f1_fused = [0.6815, 0.679750]
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(4, 3))  
     ax.bar(labels_fused, f1_fused)
     ax.set_ylabel("F1 Score")
     ax.set_title("Scaled Fused Dataset: Tuned Model vs AutoML")
     ax.set_ylim(0.65, 0.72)
 
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=False)
 
 
 
