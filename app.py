@@ -13,8 +13,29 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    .block-container {
-        padding-top: 1.5rem;
+    /* Make link buttons blue */
+    div[data-testid="stLinkButton"] > a {
+        background-color: #1f77b4 !important;
+        color: white !important;
+        border-radius: 8px;
+        padding: 0.6em 1em;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    /* Sidebar radio selected circle */
+    section[data-testid="stSidebar"] div[role="radiogroup"] label span:first-child {
+        border-color: #1f77b4 !important;
+    }
+
+    section[data-testid="stSidebar"] div[role="radiogroup"] input:checked + div span:first-child {
+        background-color: #1f77b4 !important;
+        border-color: #1f77b4 !important;
+    }
+
+    /* Hover effect */
+    section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+        color: #1f77b4 !important;
     }
     </style>
     """,
@@ -22,15 +43,29 @@ st.markdown(
 )
 
 
+
+
 # -----------------
 # Sidebar
 # -----------------
-st.sidebar.title("Analysis Type")
-
-section = st.sidebar.selectbox(
-    "Select Analysis Type",
-    ["Introduction", "Classification", "Regression", "Clustering"]
+st.sidebar.markdown(
+    """
+    # Suicide Risk Dashboard
+    _Fused Dataset Analysis_
+    """
 )
+
+st.sidebar.divider()
+
+section = st.sidebar.radio(
+    "Go to:",
+    ["Introduction", "Classification", "Regression", "Clustering"],
+    label_visibility="collapsed"
+)
+
+st.sidebar.divider()
+
+st.sidebar.caption("DebugDivas . HealthVerse")
 
 # -----------------
 # Main Page Title
@@ -41,38 +76,60 @@ st.title("🌍 Global Mental Health Dashboard")
 # Pages
 # -----------------
 if section == "Introduction":
-    st.header("🧠 Suicide Risk Analysis (Fused Dataset)")
+    st.header("Suicide Risk Analysis")
 
-    col1, col2 = st.columns([2, 1])
+    col1, col2, col3 = st.columns([2,1, 1])
 
+# -----------------
+# LEFT COLUMN
+# -----------------
     with col1:
         st.markdown(
             """
             This dashboard presents **Classification, Regression, and Clustering**
             results using a **fused global mental health dataset**.
 
-            ### 🎯 Objectives
+            ### Objectives
             - Predict suicide risk using machine learning  
             - Compare baseline, tuned, and AutoML models  
             - Explain model decisions using XAI (SHAP)  
             """
         )
 
+    # -----------------
+    # MIDDLE COLUMN
+    # -----------------
     with col2:
         st.info(
             """
-            **Fused Dataset consist of:**  
-            - Suicide statistics  
-            - Life Expetancy
-             
+            **Classification & Regression Methods**
+            - Manual ML (Scaled & Non-Scaled)
+            - Hyperparameter Tuning
+            - AutoML
+            - XAI (SHAP)
 
-            **Methods**  
-            - Manual ML  
-            - Hyperparameter tuning  
-            - AutoML  
+            **Clustering Methods**
+            - K-Means
+            - DBSCAN
+            - Hierarchical Clustering
             """
         )
 
+    # -----------------
+    # RIGHT COLUMN
+    # -----------------
+    with col3:
+        st.info("**Fused Dataset consists of:**")
+
+        st.link_button(
+            "Suicide Statistics Dataset",
+            "https://www.kaggle.com/datasets/omkargowda/suicide-rates-overview-1985-to-2021"
+        )
+
+        st.link_button(
+            "Life Expectancy Dataset",
+            "https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who"
+        )
 # ----------
 # Classification
 # ----------
@@ -119,7 +176,7 @@ elif section == "Classification":
             fig, ax = plt.subplots(figsize=(4, 3))
             ax.bar(labels_fused, f1_fused)
             ax.set_ylabel("F1 Score")
-            ax.set_title("Scaling vs No Scaling (Fused Dataset)")
+            ax.set_title("Scaling vs No Scaling (The best Models)")
             ax.set_ylim(0.6, 0.7)
             plt.xticks(rotation=20)
             st.pyplot(fig, use_container_width=False)
@@ -129,7 +186,7 @@ elif section == "Classification":
     # TAB 2: TUNING
     # -------------------
     with tabs[1]:
-        st.subheader("Hyperparameter Tuning")
+        st.subheader("Hyperparameter Tuning - gridSearch vs randomSearch")
 
         tuned_df = pd.read_csv("outputs/tuned_cls.csv")
         st.dataframe(tuned_df, use_container_width=True)
