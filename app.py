@@ -10,9 +10,9 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("🧠 Suicide Risk Analysis (Fused Dataset)")
-st.markdown("This dashboard presents **classification, regression and Clustering results** using the fused dataset.")
-
+# -----------------
+# Sidebar
+# -----------------
 st.sidebar.title("Analysis Type")
 
 section = st.sidebar.selectbox(
@@ -20,13 +20,32 @@ section = st.sidebar.selectbox(
     ["Introduction", "Classification", "Regression", "Clustering"]
 )
 
+# -----------------
+# Main Page Title
+# -----------------
 st.title("🌍 Global Mental Health Dashboard")
+
+# -----------------
+# Pages
+# -----------------
+if section == "Introduction":
+    st.header("🧠 Suicide Risk Analysis (Fused Dataset)")
+    st.markdown(
+        """
+        This dashboard presents **Classification, Regression, and Clustering**
+        results using the **fused dataset**.
+
+        The objective is to evaluate suicide risk and health outcomes
+        using traditional machine learning, hyperparameter tuning,
+        AutoML, and explainable AI (XAI).
+        """
+    )
 
 # ----------
 # Classification
 # ----------
 
-if section == "Classification":
+elif section == "Classification":
     st.header("📊 Classification Results (Fused Dataset)")
 
     # Baseline Results
