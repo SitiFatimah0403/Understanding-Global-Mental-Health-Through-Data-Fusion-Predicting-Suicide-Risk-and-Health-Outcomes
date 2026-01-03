@@ -102,13 +102,13 @@ if section == "Introduction":
     with col2:
         st.info(
             """
-            **Classification & Regression Methods**
+            ### **Classification & Regression Methods**
             - Manual ML (Scaled & Non-Scaled)
             - Hyperparameter Tuning
             - AutoML
             - XAI (SHAP)
 
-            **Clustering Methods**
+            ### **Clustering Methods**
             - K-Means
             - DBSCAN
             - Hierarchical Clustering
@@ -119,7 +119,7 @@ if section == "Introduction":
     # RIGHT COLUMN
     # -----------------
     with col3:
-        st.info("**Fused Dataset consists of:**")
+        st.info("### **Fused Dataset consists of:**")
 
         st.link_button(
             "Suicide Statistics Dataset",
@@ -130,6 +130,8 @@ if section == "Introduction":
             "Life Expectancy Dataset",
             "https://www.kaggle.com/datasets/kumarajarshi/life-expectancy-who"
         )
+
+
 # ----------
 # Classification
 # ----------
