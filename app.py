@@ -758,12 +758,12 @@ elif section == "Clustering":
             """
             ### DBSCAN Graph Interpretation
 
-            The PCA-based visualization shows that the scaled fused dataset exhibits a
+            - The PCA-based visualization shows that the scaled fused dataset exhibits a
             heterogeneous structure, with several localized dense regions and a
             substantial number of noise points. This suggests that the data does not form
             clearly separated global clusters.
 
-            Instead, the dataset displays gradually changing and overlapping feature
+            - Instead, the dataset displays gradually changing and overlapping feature
             patterns. Records with unusual combinations of socioeconomic and health-related
             features are captured as noise points, highlighting atypical or extreme
             country profiles.
@@ -774,11 +774,11 @@ elif section == "Clustering":
             """
             ### DBSCAN Configuration and Outcome
 
-            DBSCAN was applied using eps = 1.0 and min_samples = 10. With these
+            - DBSCAN was applied using eps = 1.0 and min_samples = 10. With these
             parameters, the algorithm identified 579 clusters and classified
             1,727 data points as noise.
 
-            The tuned parameters resulted in fewer fragmented clusters compared to more
+            - The tuned parameters resulted in fewer fragmented clusters compared to more
             restrictive settings, merging smaller dense regions into larger groupings.
             However, the presence of many clusters and noise points reflects the complex
             and non-uniform structure of the fused dataset.
@@ -789,12 +789,12 @@ elif section == "Clustering":
             """
             ### Interpretation and Limitation
 
-            DBSCAN highlights the existence of local similarity patterns within the
+            - DBSCAN highlights the existence of local similarity patterns within the
             dataset rather than globally separable clusters. While this is useful for
             identifying anomalous or atypical records, it limits the interpretability of
             DBSCAN for country-level clustering.
 
-            As a result, DBSCAN is not used for further cluster profiling or comparison
+            - As a result, DBSCAN is not used for further cluster profiling or comparison
             and the clustering analysis focuses on k-Means and hierarchical clustering,
             which provide more stable and interpretable global groupings.
             """
