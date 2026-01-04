@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+
 st.set_page_config(
     page_title="Fused Dataset – Suicide Risk Analysis",
     layout="wide"
@@ -37,11 +38,22 @@ st.markdown(
     section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
         color: #1f77b4 !important;
     }
+
+    /* Make st.info text brighter blue */
+        div[data-testid="stInfo"] {
+            border-left: 4px solid #1f77b4 !important;
+            background-color: rgba(31, 119, 180, 0.08) !important;
+        }
+
+        div[data-testid="stInfo"] * {
+            color: #a9cee9ff !important;
+            font-weight: 500;
+        }
+
     </style>
     """,
     unsafe_allow_html=True
 )
-
 
 
 
@@ -183,6 +195,32 @@ elif section == "Classification":
             plt.xticks(rotation=20)
             st.pyplot(fig, use_container_width=False)
 
+        st.markdown(
+        """
+        ### What the graph shows
+        This graph compares the **best F1 score** achieved under different **train–test splits**
+        and **scaling settings** for the fused dataset.
+
+        ---
+
+        ### Interpretation
+        - For both **80–20** and **70–30** splits, **scaled data consistently achieves higher F1 scores**
+        than non-scaled data.
+        - The **80–20 scaled (SVM)** and **70–30 scaled (ANN)** settings achieved the **highest performance**
+        (≈ **0.658**).
+        - In contrast, **non-scaled models** (SVM and Naive Bayes) show noticeably lower F1 scores
+        (≈ **0.643**).
+
+        ---
+
+        ### Conclusion
+        Scaling is beneficial for the fused dataset because it contains **heterogeneous features**
+        (health, demographic, and socio-economic indicators) with different value ranges.
+
+      
+        """
+        )
+
 
     # -------------------
     # TAB 2: TUNING
@@ -214,6 +252,34 @@ elif section == "Classification":
 
             st.pyplot(fig, use_container_width=False)
 
+        st.markdown(
+        """
+
+        ### What the graph shows
+        This graph compares **GridSearchCV** and **RandomizedSearchCV** for the top three
+        classification models (**SVM, ANN, and XGBoost**) using the **scaled fused dataset**.
+
+        ---
+
+        ### Interpretation
+        - **SVM** shows identical performance under both Grid Search and Random Search  
+        (F1 ≈ **0.6723**), indicating **stable hyperparameter sensitivity**.
+        - **ANN** performs better with **Grid Search** (F1 ≈ **0.6722**) than with
+        Random Search (≈ **0.6531**), suggesting ANN benefits from **systematic parameter exploration**.
+        - **XGBoost** achieves the **highest F1 score overall**, where  
+        **Grid Search (0.6815)** outperforms Random Search (0.6737).
+
+        ---
+
+        ### Conclusion
+        Grid Search is more effective for the fused dataset, especially for
+        **complex models such as ANN and XGBoost**.
+
+        As a result, **XGBoost tuned using Grid Search** is selected as the
+        **best-performing manual classification model**.
+        """
+        )
+
     # -------------------
     # TAB 3: AUTOML
     # -------------------
@@ -239,6 +305,99 @@ elif section == "Classification":
 
 
             st.pyplot(fig, use_container_width=False)
+
+        st.markdown(
+        """
+
+        ### What the graph shows
+        This graph compares the **best manually tuned model**
+        (**XGBoost with Grid Search**) against an **AutoML-generated model**
+        (**LightGBM**) using the scaled fused dataset.
+
+        ---
+
+        ### Interpretation
+        - **Tuned XGBoost** achieves an F1 score of **0.6815**.
+        - **AutoML (LightGBM)** achieves a slightly lower F1 score of **0.6798**.
+        - The performance gap is **very small**, indicating that AutoML is
+        **highly competitive**, though it does not surpass expert-guided tuning.
+
+        ---
+
+        ### Conclusion
+        Manual hyperparameter tuning **slightly outperforms AutoML** for the fused dataset.
+
+        However, **AutoML remains a strong alternative** due to:
+        - faster setup,
+        - automated model selection,
+        - and performance close to the optimal tuned model.
+        """
+        )
+
+    
+    # -------------------
+    # TAB 4: XAI
+    # -------------------
+    with tabs[3]:
+        st.subheader("XAI for The Best Model")
+
+        st.markdown(
+            """
+            This section explains **why** the best-performing classification model
+            makes its predictions, using **XGBoost + SHAP**.
+            """
+        )
+
+        # Feature Importance
+        st.markdown("### Feature Importance (XGBoost)")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image(
+                "outputs/xai/scaled_xgb_feature_importance.png",
+                width=600
+            )
+
+        st.markdown(
+            """ 
+            This figure presents the global feature importance from the best tuned XGBoost model. The results show that 
+            development status is the most dominant predictor of suicide risk, indicating that whether a country is developing or developed strongly influences 
+            the model’s classification. Health and social indicators such as thinness among children aged 5–9 years, schooling, HIV/AIDS prevalence, income composition of resources, and adult mortality also contribute notably, 
+            while economic indicators and immunisation variables play a relatively minor role. However, this plot only reflects feature importance and does not indicate whether a feature increases or decreases suicide risk.
+                """
+        )
+
+        # SHAP Summary
+        st.markdown("### SHAP Summary Plot")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image(
+                "outputs/xai/scaled_shap_summary.png",
+                width=600
+            )
+        st.markdown(
+            """ 
+            This figure  shows the SHAP summary plot for the high suicide risk class, providing directional interpretability.
+            Higher levels of child thinness, developing-country status, higher adult mortality, and lower life expectancy consistently push predictions toward high suicide risk. 
+            In contrast, higher schooling levels and longer life expectancy reduce predicted risk, highlighting the protective role of education and overall health. 
+            These findings indicate that health vulnerability, malnutrition, and lower education are key drivers of high suicide risk.
+                """
+        )
+
+        # SHAP Dependence
+        st.markdown("### SHAP Dependence Plot")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image(
+                "outputs/xai/scaled_shap_dependence_life_expectancy.png",
+                width=600
+            )
+        st.markdown(
+            """ 
+            This figure illustrates the SHAP dependence plot for life expectancy with adult mortality as an interacting feature. Lower life expectancy strongly increases 
+            suicide risk, and this effect is amplified when adult mortality is high, demonstrating an interaction between these two health indicators. Overall, the SHAP 
+            analysis confirms that suicide risk is primarily driven by health and social conditions rather than economic factors.
+                """
+        )
 
 
 
