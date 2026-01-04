@@ -105,8 +105,18 @@ if section == "Introduction":
             - Predict suicide risk using machine learning  
             - Compare baseline, tuned, and AutoML models  
             - Explain model decisions using XAI (SHAP)  
+            - Compare clustering evaluation metrics across different algorithms
+            - Examine how clusters are formed and structured under each clustering approach
+
+            ### Data Preparation and Justification
+            During the preprocessing stage of the fused dataset, non-predictive and high-cardinality variables such as country,
+            year, age, sex, suicide_no, population, gdp_for_year and generation were removed. These attributes were excluded because they do not 
+            contribute directly to model learning, may introduce unnecessary dimensionality, and could lead to biased or unstable model behaviour.
+
             """
         )
+        
+        
 
     # -----------------
     # MIDDLE COLUMN
@@ -409,3 +419,122 @@ elif section == "Classification":
 # ----------
 # Clustering
 # ----------
+# ----------
+# Clustering
+# ----------
+
+elif section == "Clustering":
+    st.header("Clustering Analysis")
+
+    tabs = st.tabs([
+        "Overview & Comparison",
+        "k-Means",
+        "Hierarchical",
+        "DBSCAN"
+    ])
+
+  
+    # -------------------
+    # CLUSTERING ALGORITHM COMPARISON
+    # -------------------
+    with tabs[0]:
+        st.subheader("Clustering Algorithm Comparison")
+
+        st.markdown(
+            """
+            Here we compare clustering evaluation metrics across different algorithms
+            to provide context before analysing how the number of clusters is determined
+            for each method.
+            """
+        )
+
+        # Load comparison table
+        df = pd.read_csv("outputs/clustering_evaluation.csv")
+
+        comparison_df = df[
+            [
+                "Algorithm",
+                "No. of Clusters",
+                "Cluster Selection Method",
+                "Silhouette Score",
+                "Davies-Bouldin Index (DBI)"
+            ]
+        ]
+
+        st.dataframe(comparison_df, use_container_width=True)
+
+        # Metric Comparison Graphs
+        st.markdown("### Metric Comparison")
+
+        algorithms = ["k-Means", "Hierarchical"]
+        silhouette_scores = [0.24, 0.17]
+        dbi_scores = [1.52, 1.84]
+
+        col1, col2 = st.columns(2)
+
+        # Silhouette Score graph
+        with col1:
+            fig, ax = plt.subplots(figsize=(4, 3))
+            ax.bar(algorithms, silhouette_scores)
+            ax.set_ylabel("Silhouette Score")
+            ax.set_title("Silhouette Score Comparison")
+            ax.set_ylim(0, 0.3)
+            st.pyplot(fig, use_container_width=True)
+
+        # DBI graph
+        with col2:
+            fig, ax = plt.subplots(figsize=(4, 3))
+            ax.bar(algorithms, dbi_scores)
+            ax.set_ylabel("Davies-Bouldin Index")
+            ax.set_title("Davies-Bouldin Index Comparison")
+            ax.set_ylim(1.4, 2.0)
+            st.pyplot(fig, use_container_width=True)
+
+        # Interpretation
+        st.markdown(
+            """
+            ### Interpretation
+
+            **Silhouette Score**  
+            The silhouette score comparison shows that k-Means achieves slightly stronger
+            cluster separation than hierarchical clustering. This indicates that k-Means
+            forms more compact and well-defined clusters, while hierarchical clustering
+            emphasises broader groupings. This behaviour aligns with the role of hierarchical
+            clustering in capturing high-level structural patterns rather than maximising
+            internal cluster separation.
+
+            **Davies-Bouldin Index (DBI)**  
+            The Davies-Bouldin Index comparison indicates that k-Means produces clusters
+            with lower overlap and better compactness compared to hierarchical clustering.
+            The higher DBI value observed for hierarchical clustering reflects its tendency
+            to form more general groupings instead of tightly compact clusters, which is
+            consistent with its use for high-level wellbeing structure analysis.
+
+            **DBSCAN**  
+            DBSCAN is not directly comparable using these metrics, as its results are highly
+            sensitive to noise and parameter settings, making silhouette score and DBI values
+            unstable or less meaningful for this dataset.
+            """
+        )
+
+    # -------------------
+    # k-MEANS 
+    # -------------------
+    with tabs[1]:
+        st.subheader("k-Means Clustering")
+        st.info("Elbow, Silhouette, DBI graphs and cluster profiling will be shown here.")
+
+    # -------------------
+    # HIERARCHICAL 
+    # -------------------
+    with tabs[2]:
+        st.subheader("Hierarchical Clustering")
+        st.info("Dendrogram analysis and cluster interpretation will be shown here.")
+
+    
+    # -------------------
+    # DBSCAN
+    # -------------------
+    with tabs[3]:
+        st.subheader("DBSCAN Clustering")
+        st.info("DBSCAN parameter tuning and limitations will be shown here.")

@@ -1,0 +1,4 @@
+Algorithm,Cluster Selection Method,No. of Clusters,Elbow Method,Silhouette Score,Davies-Bouldin Index (DBI),Cluster Size Distribution
+k-Means,Elbow Method + Silhouette,K = 4,190292.78 (Elbow at K = 4),0.2353 (Highest at K = 4),1.5170 (Second lowest value),Balanced / Imbalanced
+Hierarchical Clustering,Dendrogram cut,K = 3 (higher level cut),N/A,0.1717,1.8428,Hierarchical grouping
+DBSCAN,Eps & min_samples tuning,Auto,N/A,Often not stable or not reported due to noise,Often not meaningful due to noise clusters,Noise + core cluster
