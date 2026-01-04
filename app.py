@@ -111,11 +111,52 @@ if section == "Introduction":
             ### Data Preparation and Justification
             During the preprocessing stage of the fused dataset, non-predictive and high-cardinality variables such as country,
             year, age, sex, suicide_no, population, gdp_for_year and generation were removed. These attributes were excluded because they do not 
-            contribute directly to model learning, may introduce unnecessary dimensionality, and could lead to biased or unstable model behaviour.
+            contribute directly to model learning, may introduce unnecessary dimensionality and could lead to biased or unstable model behaviour.
 
+            ### Features Used
             """
-        )
-        
+        ) 
+
+        fcol1, fcol2, fcol3 = st.columns(3)
+
+        with fcol1:
+            st.markdown(
+                """
+                - Status  
+                - Life expectancy  
+                - Adult Mortality  
+                - Infant deaths  
+                - Alcohol  
+                - Percentage expenditure  
+                - Hepatitis B  
+                """
+            )
+
+        with fcol2:
+            st.markdown(
+                """
+                - Measles  
+                - BMI  
+                - Under-five deaths  
+                - Polio  
+                - Total expenditure  
+                - Diphtheria  
+                - HIV/AIDS  
+                """
+            )
+
+        with fcol3:
+            st.markdown(
+                """
+                - GDP  
+                - Thinness 5–9 years
+                - Income composition of resources  
+                - Schooling  
+                - GDP per capita ($)  
+                - HDI for year  
+                - Suicides/100k population  
+                """
+            )     
         
 
     # -----------------
@@ -419,16 +460,12 @@ elif section == "Classification":
 # ----------
 # Clustering
 # ----------
-# ----------
-# Clustering
-# ----------
-
 elif section == "Clustering":
     st.header("Clustering Analysis")
 
     tabs = st.tabs([
         "Overview & Comparison",
-        "k-Means",
+        "K-Means",
         "Hierarchical",
         "DBSCAN"
     ])
@@ -518,23 +555,247 @@ elif section == "Clustering":
         )
 
     # -------------------
-    # k-MEANS 
+    # K-MEANS 
     # -------------------
     with tabs[1]:
-        st.subheader("k-Means Clustering")
-        st.info("Elbow, Silhouette, DBI graphs and cluster profiling will be shown here.")
+        st.subheader("K-Means Cluster Selection")
+
+        st.markdown(
+         """
+         The optimal number of clusters was selected using a combination of the
+         Elbow Method, Silhouette Score and Davies–Bouldin Index.
+         """
+        )
+
+         # Display validation plots side by side
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.image(
+                "outputs/metric/elbow.png",
+                caption="Elbow Method",
+                use_container_width=True
+            )
+
+        with col2:
+            st.image(
+                "outputs/metric/silhouette.png",
+                caption="Silhouette Score",
+                use_container_width=True
+            )
+
+        with col3:
+            st.image(
+                "outputs/metric/dbi.png",
+                caption="Davies–Bouldin Index",
+                use_container_width=True
+            )
+
+        # Explanation
+        st.markdown(
+            """
+            **Elbow Method**  
+            The Elbow Method shows a clear reduction in inertia up to K = 4, after which
+            the rate of improvement becomes more gradual. This indicates diminishing returns
+            from adding additional clusters.
+
+            **Silhouette Score**  
+            Silhouette analysis further supports this choice, with the highest silhouette
+            score observed at K = 4 (0.2353), suggesting the best balance between cluster
+            cohesion and separation.
+
+            **Davies–Bouldin Index (DBI)**  
+            Although the Davies–Bouldin Index reaches its minimum at K = 7 (1.3727),
+            this reduction is primarily due to increased cluster fragmentation, where clusters
+            become smaller and less interpretable.
+
+            **Final Selection**  
+            Therefore, K = 4 was selected as it provides the most meaningful and stable
+            clustering structure, balancing quantitative validation metrics with
+            interpretability at the country level.
+            """
+        )
+
+        st.markdown("### K-Means Cluster Evaluation")
+
+        # Load cluster evaluation table
+        kmeans_eval_df = pd.read_csv("outputs/kmeans_evaluation.csv")
+
+        st.dataframe(kmeans_eval_df, use_container_width=True)
+
+        # Interpretation
+        st.markdown(
+            """
+            ### Cluster Interpretation
+
+            **Cluster 0 : Low Development Countries**  
+            It exhibits the lowest average life expectancy, GDP and schooling levels, indicating weak performance
+            across key development indicators. This cluster also records the lowest average suicide rate, suggesting that
+            lower reported suicide rates may be associated with underdeveloped health systems, reporting practices or
+            demographic factors rather than improved mental wellbeing.
+
+            **Cluster 1 : High Development Countries**  
+            It records the highest average life expectancy, GDP and schooling levels, reflecting strong health,
+            economic, and educational outcomes. Despite high development status, this cluster shows a relatively high
+            average suicide rate, highlighting that higher socioeconomic development does not necessarily correspond
+            to lower suicide risk.
+
+            **Cluster 2 : Medium Development Countries**  
+            It shows the second highest average life expectancy, GDP and schooling, indicating medium
+            developing countries that are approaching high development status. The average suicide rate in this cluster
+            is also relatively high, suggesting increasing mental health challenges as countries transition toward higher
+            development levels.
+
+            **Cluster 3 : Medium Development Countries**  
+            It ranks below Cluster 2 in life expectancy, GDP and schooling, representing medium developing
+            countries with weaker development outcomes. The average suicide rate in this cluster remains elevated,
+            though slightly lower than in Cluster 2, indicating that suicide risk varies across different stages of
+            development.
+            """
+        )
+
 
     # -------------------
     # HIERARCHICAL 
     # -------------------
     with tabs[2]:
-        st.subheader("Hierarchical Clustering")
-        st.info("Dendrogram analysis and cluster interpretation will be shown here.")
+        st.subheader("Hierarchical Clustering Analysis")
+
+        st.markdown(
+            """
+            Hierarchical clustering was analysed using a dendrogram to examine how
+            countries are grouped at different linkage distances. The number of clusters
+            was determined by inspecting the dendrogram structure.
+            """
+        )
+
+        # Display dendrogram
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image(
+                "outputs/metric/hierarchical.png",
+                caption="Hierarchical Clustering Dendrogram",
+                use_container_width=True
+            )
+
+        # Interpretation
+        st.markdown(
+            """
+            - The dendrogram illustrates how countries are progressively merged based on
+            similarity across health, socioeconomic and demographic indicators.
+            - A higher-level cut of the dendrogram was selected, resulting in
+            3 main clusters. This cut captures broad and interpretable groupings
+            while avoiding excessive fragmentation into small clusters.
+            - Cutting the dendrogram at lower levels would produce a larger number of
+            clusters with finer distinctions, but these clusters become less stable
+            and harder to interpret at the country level.
+            - Therefore, K = 3 was chosen as it provides a meaningful balance between
+            structural simplicity and interpretability, making it suitable for
+            high-level wellbeing analysis.
+            """
+        )
+
+        st.markdown("### Hierarchical Cluster Evaluation")
+
+        # Load hierarchical cluster evaluation table
+        hierarchical_eval_df = pd.read_csv("outputs/hierarchical_evaluation.csv")
+
+        # Display table
+        st.dataframe(hierarchical_eval_df, use_container_width=True)
+
+        # Interpretation
+        st.markdown(
+            """
+            ### Cluster Interpretation
+
+            **Cluster 1 : High Development Countries**  
+            This cluster records the highest average life expectancy, GDP and schooling levels,
+            indicating strong overall development outcomes. Despite high socioeconomic status,
+            the average suicide rate is relatively high, suggesting that higher development does
+            not necessarily correspond to lower suicide risk.
+
+            **Cluster 2 : Low Development Countries**  
+            Cluster 2 exhibits the lowest average life expectancy, GDP and schooling levels.
+            This cluster also shows the lowest average suicide rate, which may reflect differences
+            in population structure, underreporting, or limited mental health surveillance rather
+            than improved mental wellbeing.
+
+            **Cluster 3 : Medium Development Countries**  
+            This cluster represents countries with moderate levels of life expectancy, GDP and
+            schooling. The average suicide rate in this group is higher than in low development
+            countries but lower than in high development countries, indicating a transitional
+            pattern of suicide risk across development stages.
+            """
+        )
 
     
     # -------------------
     # DBSCAN
     # -------------------
     with tabs[3]:
-        st.subheader("DBSCAN Clustering")
-        st.info("DBSCAN parameter tuning and limitations will be shown here.")
+        st.subheader("DBSCAN Clustering Analysis")
+
+        st.markdown(
+            """
+            DBSCAN was applied to the scaled fused dataset using all numerical features,
+            including suicides/100k population, to allow the algorithm to identify
+            atypical records across both health and socioeconomic dimensions. Unlike
+            k-Means and hierarchical, DBSCAN is a density-based clustering algorithm and does not require
+            pre-specifying the number of clusters.
+            """
+        )
+
+        # DBSCAN visualization
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image(
+                "outputs/metric/dbscan.png",
+                caption="DBSCAN Clustering Results (PCA-reduced)",
+                use_container_width=True
+            )
+
+        st.markdown(
+            """
+            ### DBSCAN Graph Interpretation
+
+            The PCA-based visualization shows that the scaled fused dataset exhibits a
+            heterogeneous structure, with several localized dense regions and a
+            substantial number of noise points. This suggests that the data does not form
+            clearly separated global clusters.
+
+            Instead, the dataset displays gradually changing and overlapping feature
+            patterns. Records with unusual combinations of socioeconomic and health-related
+            features are captured as noise points, highlighting atypical or extreme
+            country profiles.
+            """
+        )
+
+        st.markdown(
+            """
+            ### DBSCAN Configuration and Outcome
+
+            DBSCAN was applied using eps = 1.0 and min_samples = 10. With these
+            parameters, the algorithm identified 579 clusters and classified
+            1,727 data points as noise.
+
+            The tuned parameters resulted in fewer fragmented clusters compared to more
+            restrictive settings, merging smaller dense regions into larger groupings.
+            However, the presence of many clusters and noise points reflects the complex
+            and non-uniform structure of the fused dataset.
+            """
+        )
+
+        st.markdown(
+            """
+            ### Interpretation and Limitation
+
+            DBSCAN highlights the existence of local similarity patterns within the
+            dataset rather than globally separable clusters. While this is useful for
+            identifying anomalous or atypical records, it limits the interpretability of
+            DBSCAN for country-level clustering.
+
+            As a result, DBSCAN is not used for further cluster profiling or comparison
+            and the clustering analysis focuses on k-Means and hierarchical clustering,
+            which provide more stable and interpretable global groupings.
+            """
+        )
