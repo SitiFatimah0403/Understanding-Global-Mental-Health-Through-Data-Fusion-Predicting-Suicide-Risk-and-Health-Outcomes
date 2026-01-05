@@ -1,0 +1,7 @@
+Model,RMSE,MAE
+Random Forest Regressor (RFR),17.384059,11.103800
+Linear Regression,17.643497,11.582805
+K-Nearest Neighbors,18.085607,11.307670
+Support Vector Machine,18.611289,10.038649
+MLP Regressor (ANN),16.493129,10.774773
+

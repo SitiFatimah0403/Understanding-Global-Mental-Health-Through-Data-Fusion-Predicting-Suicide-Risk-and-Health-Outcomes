@@ -1,0 +1,5 @@
+Tuned Model,RMSE,MAE
+Random Forest Regressor (Grid), 16.946118,	10.851623
+MLP Regressor (ANN) (Grid),	16.493129,	10.774773
+Random Forest Regressor(Randomized),	16.941014,	10.845848
+MLP Regressor (ANN) (Randomized),	16.484933,	10.774292

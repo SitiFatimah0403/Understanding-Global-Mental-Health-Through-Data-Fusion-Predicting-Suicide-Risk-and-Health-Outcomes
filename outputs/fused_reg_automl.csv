@@ -1,0 +1,13 @@
+model,score_holdout,score_val,eval_metric,pred_time_test,pred_time_val,fit_time,pred_time_test_marginal,pred_time_val_marginal,fit_time_marginal,stack_level,can_infer,fit_order
+WeightedEnsemble_L2,-16.129157,-16.216944,root_mean_squared_error,3.013783,0.858088,234.015987,0.003377,0.000905,0.040512,2,True,10
+CatBoost_BAG_L1,-16.156067,-16.287127,root_mean_squared_error,0.456473,0.047081,48.907513,0.456473,0.047081,48.907513,1,True,4
+NeuralNetFastAI_BAG_L1,-16.164820,-16.278423,root_mean_squared_error,1.171052,0.618920,148.465740,1.171052,0.618920,148.465740,1,True,6
+LightGBMXT_BAG_L1,-16.186413,-16.290922,root_mean_squared_error,1.382882,0.191182,36.602222,1.382882,0.191182,36.602222,1,True,1
+LightGBM_BAG_L1,-16.270577,-16.409432,root_mean_squared_error,0.063187,0.068554,34.695792,0.063187,0.068554,34.695792,1,True,2
+XGBoost_BAG_L1,-16.357396,-16.568515,root_mean_squared_error,0.126921,0.131589,34.269246,0.126921,0.131589,34.269246,1,True,7
+LightGBMLarge_BAG_L1,-16.738766,-16.947972,root_mean_squared_error,0.073370,0.069858,30.175952,0.073370,0.069858,30.175952,1,True,9
+NeuralNetTorch_BAG_L1,-16.928878,-17.004925,root_mean_squared_error,0.251681,0.542113,209.272233,0.251681,0.542113,209.272233,1,True,8
+LightGBMXT_BAG_L2,-16.944024,-8.447127,root_mean_squared_error,42.271611,59.072285,840.618969,38.251207,56.262246,263.843304,2,True,11
+WeightedEnsemble_L3,-16.944024,-8.447127,root_mean_squared_error,42.274357,59.073119,840.659207,0.002746,0.000834,0.040237,3,True,12
+ExtraTreesMSE_BAG_L1,-17.244016,-17.325384,root_mean_squared_error,0.230211,0.580794,8.287327,0.230211,0.580794,8.287327,1,True,5
+RandomForestMSE_BAG_L1,-17.244902,-17.325318,root_mean_squared_error,0.264628,0.559948,26.099640,0.264628,0.559948,26.099640,1,True,3

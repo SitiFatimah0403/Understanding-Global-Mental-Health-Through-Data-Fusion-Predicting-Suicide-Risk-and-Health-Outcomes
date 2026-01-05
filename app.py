@@ -456,6 +456,366 @@ elif section == "Classification":
 # ----------
 # Regression
 # ----------
+elif section == "Regression":
+    st.header("Regression Results")
+
+    tabs = st.tabs([
+        "Baseline",
+        "Tuning",
+        "AutoML",
+        "XAI"
+    ])
+
+    # -------------------
+    # TAB 1: BASELINE
+    # -------------------
+    with tabs[0]:
+        st.subheader("Baseline Models - Scaling vs No Scaling")
+
+        col1, col2 = st.columns(2)
+
+        # ---------- Tables ----------
+        df_ns_80 = pd.read_csv("outputs/nonscaled_fused_reg_baseline_80_20.csv")
+        df_ns_70 = pd.read_csv("outputs/nonscaled_fused_reg_baseline_70_30.csv")
+        df_s_80  = pd.read_csv("outputs/scaled_fused_reg_baseline_80_20.csv")
+        df_s_70  = pd.read_csv("outputs/scaled_fused_reg_baseline_70_30.csv")
+
+        for df in [df_ns_80, df_ns_70, df_s_80, df_s_70]:
+            df.set_index("Model", inplace=True)
+
+        df_s_80.columns  = pd.MultiIndex.from_product([["80–20"], ["Scaling"], df_s_80.columns])
+        df_ns_80.columns = pd.MultiIndex.from_product([["80–20"], ["Non-Scaled"], df_ns_80.columns])
+
+        df_s_70.columns  = pd.MultiIndex.from_product([["70–30"], ["Scaling"], df_s_70.columns])
+        df_ns_70.columns = pd.MultiIndex.from_product([["70–30"], ["Non-Scaled"], df_ns_70.columns])
+
+        df_baseline = pd.concat(
+            [df_s_80, df_ns_80, df_s_70, df_ns_70],
+            axis=1
+        ).round(3)
+
+        # ---------- Polish ----------
+        df_baseline.rename_axis("Algorithm", axis=0, inplace=True)
+        df_baseline = df_baseline.fillna("–")
+
+        # ---------- Display ----------
+        st.dataframe(df_baseline, use_container_width=True)
+
+        st.markdown(
+            """
+            Based on the baseline results above, the **best-performing regression model under each experimental setting**
+            was identified using RMSE as the primary selection criterion. For the scaled configurations, the **MLP Regressor (ANN)**
+            consistently achieved the lowest RMSE, while for the non-scaled configurations, the **Random Forest Regressor (RFR)**
+            performed best due to its scale-invariant nature. 
+
+            The following comparison visualises the RMSE of these selected models
+            to highlight the impact of feature scaling and train–test split ratios on regression performance.
+            """
+        )
+
+        # ---------- Bar Chart ----------
+        labels_fused = [
+            "80–20 | Scaled \n(ANN)",
+            "80–20 | Non-Scaled \n(RFR)",
+            "70–30 | Scaled \n(RFR)",
+            "70–30 | Non-Scaled \n(RFR)"
+        ]
+
+        rmse_fused = [
+            16.493129,   # scaled 80–20
+            17.418644,   # non-scaled 80–20
+            16.231541,   # scaled 70–30
+            17.201479     # non-scaled 70–30
+        ]
+
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            fig, ax = plt.subplots(figsize=(4, 3))
+            ax.bar(labels_fused, rmse_fused)
+            ax.set_ylabel("RMSE")
+            ax.set_title("Scaling vs No Scaling (Best Regression Models)")
+            ax.set_ylim(15, 19)
+            plt.setp(ax.get_xticklabels(), rotation=15, fontsize=6)
+            st.pyplot(fig, use_container_width=False)
+
+            
+
+        # ---------- Explanation ----------
+        st.markdown(
+            """
+            ### What the graph shows
+            This graph compares the **lowest RMSE values** achieved under different
+            **train–test splits** and **scaling settings** for the fused dataset.
+
+            ---
+
+            ### Interpretation
+            - For both **80–20** and **70–30** splits, **scaled data consistently achieves lower RMSE**
+            compared to non-scaled data.
+            - The **scaled ANN model** achieves the **best baseline performance**
+            (RMSE ≈ **16.5**).
+            - In contrast, **non-scaled models** show higher prediction error
+            (RMSE ≈ **17.5**).
+
+            ---
+
+            ### Conclusion
+            Scaling is beneficial for regression on the fused dataset because it contains
+            **features with different numerical ranges**, allowing the model to learn
+            balanced relationships and reduce prediction error.
+            """
+        )
+
+    # -------------------
+    # TAB 2: TUNING
+    # -------------------
+    with tabs[1]:
+        st.subheader("Hyperparameter Tuning under 80-20 Train-Test Split  – Regression Models")
+
+        # Load tuned regression results
+        df = pd.read_csv("outputs/tuned_reg.csv")
+
+        # Identify search method
+        df["Search"] = df["Tuned Model"].apply(
+            lambda x: "GridSearch" if "Grid" in x else "Randomized Search"
+        )
+
+        # Clean model names
+        df["Model"] = df["Tuned Model"].str.replace(
+            r"\s*\(Grid\)|\s*\(Randomized\)", "", regex=True
+        )
+
+        # Pivot to hierarchical columns
+        pivot_df = df.pivot(
+            index="Model",
+            columns="Search",
+            values=["RMSE", "MAE"]
+        )
+
+        # Swap column levels → Grid/Random on top, RMSE/MAE below
+        pivot_df = pivot_df.swaplevel(axis=1).sort_index(axis=1)
+
+        # Display table
+        st.dataframe(pivot_df, use_container_width=True)
+       
+        with tabs[1]:
+
+                models_fused = ["MLP Regressor \n(ANN)", "Random Forest Regressor"]
+                grid_f1_fused = [16.493129, 16.484933]
+                random_f1_fused = [16.946118, 16.941014]
+
+                x = np.arange(len(models_fused))
+                width = 0.35
+
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    fig, ax = plt.subplots(figsize=(7, 7))
+                    ax.bar(x - width/2, grid_f1_fused, width, label="Grid Search")
+                    ax.bar(x + width/2, random_f1_fused, width, label="Random Search")
+                    ax.set_xticks(x)
+                    ax.set_xticklabels(models_fused)
+                    ax.set_ylabel("RMSE")
+                    ax.set_title("GridSearch vs RandomizedSearch")
+                    ax.legend()
+                    ax.set_ylim(10, 18)
+
+                    st.pyplot(fig, use_container_width=False)
+
+                st.markdown(
+                """
+                ### What the graph shows
+                This graph compares **GridSearchCV** and **RandomizedSearchCV** for the top two
+                regression models (*MLP Regressor (ANN)* and *Random Forest Regressor*) using the
+                **scaled fused dataset under 80-20 train-test split conditions**. Model performance is evaluated using **RMSE**, where
+                lower values indicate better predictive accuracy.
+
+                ---
+
+                ### Interpretation
+                - For **MLP Regressor (ANN)**, both Grid Search and Randomized Search achieve
+                very similar RMSE values (≈ **16.49**), indicating that the model is **stable**
+                with respect to hyperparameter tuning. Randomized Search shows a marginally
+                lower RMSE, suggesting that random exploration is sufficient to find a near-optimal
+                configuration.
+                - For **Random Forest Regressor**, Randomized Search also produces a slightly
+                lower RMSE compared to Grid Search (≈ **16.94** vs **16.95**). This small difference
+                implies that Random Forest is **robust to hyperparameter variations**, and exhaustive
+                grid exploration does not provide a significant advantage.
+
+                ---
+
+                ### Conclusion
+                Overall, **RandomizedSearchCV performs comparably to GridSearchCV** for both
+                regression models while being more computationally efficient. Among the tuned
+                models, **MLP Regressor (ANN)** achieves the **lowest RMSE**, making it the
+                best-performing regression model on the fused dataset under 80-20 train-test split.
+                """
+                )
+
+        # -------------------
+        # TAB 3: AUTOML
+        # -------------------
+        with tabs[2]:
+                st.subheader("AutoML vs Manual Modeling")
+
+                fused_automl_df = pd.read_csv("outputs/fused_reg_automl.csv")
+                st.dataframe(fused_automl_df, use_container_width=True)
+
+                fused_automl_df = pd.read_csv("outputs/reg_manual_automl_compare.csv")
+                st.dataframe(fused_automl_df, use_container_width=True)
+
+                labels = ["Grid Search (ANN)", "AutoML \n(WeightedEnsemble_L2)"]
+                f1_vals = [16.484933,16.2986]
+
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    fig, ax = plt.subplots(figsize=(4, 3))
+                    ax.bar(labels, f1_vals)
+                    ax.set_ylabel("RMSE")
+                    ax.set_title("Tuned Model vs AutoML")
+                    ax.set_ylim(16, 17)
+
+
+                    st.pyplot(fig, use_container_width=False)
+
+                st.markdown(
+                """
+                ### What the graph shows
+                This graph compares the **best manually tuned regression model**
+                (**MLP Regressor (ANN) tuned using Grid Search**) with an
+                **AutoML-generated regression model** (**WeightedEnsemble_L2**)
+                using the **fused dataset**. Model performance is evaluated using
+                **RMSE**, where lower values indicate better predictive accuracy.
+
+                ---
+
+                ### Interpretation
+                - The **manually tuned ANN model** achieves an RMSE of **16.4849**,
+                demonstrating strong predictive performance after systematic
+                hyperparameter tuning.
+                - The **AutoML model (WeightedEnsemble_L2)** achieves a lower RMSE
+                of **16.2986**, outperforming the manually tuned ANN model.
+                - This improvement suggests that AutoML is able to **effectively
+                combine multiple models and optimize configurations automatically**,
+                resulting in better generalization performance.
+
+                ---
+
+                ### Conclusion
+                The results indicate that **AutoML outperforms manual hyperparameter tuning**
+                for the fused regression dataset. While manual tuning of ANN provides
+                competitive performance, **AutoML delivers the best overall result**
+                with lower RMSE and reduced human effort.
+
+                Therefore, **AutoML (WeightedEnsemble_L2)** is selected as the
+                **best-performing regression approach** for this dataset.
+                """
+                )
+
+
+    # -------------------
+    # TAB 4: XAI
+    # -------------------
+    import os
+
+    IMAGE_WIDTH = 800  # balanced size
+
+    with tabs[3]:
+        st.subheader("XAI for the Best Regression Model")
+
+        st.markdown(
+            """
+            This section explains **why** the best-performing regression model 
+            makes its predictions on the **fused dataset**, using **ANN with SHAP** 
+            for model interpretability.
+            """
+        )
+
+        # -------------------
+        # Global Feature Importance
+        # -------------------
+        st.markdown("### Global Feature Importance (SHAP)")
+
+        img_global = "outputs/SHAP_regression/reg_feature_importance_shap.png"
+
+        col1, col2, col3 = st.columns([1, 3, 1])  # 👈 center emphasis
+        with col2:
+            if os.path.exists(img_global):
+                st.image(img_global, width=IMAGE_WIDTH)
+            else:
+                st.warning("Global SHAP feature importance image not found.")
+
+        st.markdown(
+            """
+            This figure illustrates the global feature importance based on the mean 
+            absolute SHAP values for the ANN regression model. Life expectancy emerges 
+            as the most influential feature, followed by GDP per capita ($) and adult 
+            mortality. These features exhibit the strongest overall contribution to 
+            the model’s suicide rate predictions across the fused dataset. The ranking 
+            reflects the magnitude of influence but does not indicate the direction 
+            of impact.
+            """
+        )
+
+        # -------------------
+        # SHAP Summary Plot
+        # -------------------
+        st.markdown("### SHAP Summary Plot")
+
+        img_summary = "outputs/SHAP_regression/reg_summary_plot_shap.png"
+
+        col1, col2, col3 = st.columns([1, 3, 1])
+        with col2:
+            if os.path.exists(img_summary):
+                st.image(img_summary, width=IMAGE_WIDTH)
+            else:
+                st.warning("SHAP summary plot image not found.")
+
+        st.markdown(
+            """
+            This figure presents the SHAP summary plot, which visualizes both the 
+            importance and directional impact of features across multiple observations. 
+            Higher life expectancy values are generally associated with negative SHAP 
+            values, indicating a reduction in predicted suicide rates. In contrast, 
+            higher adult mortality and higher GDP per capita ($) contribute positively 
+            to the predictions in certain instances. The spread of SHAP values highlights 
+            the non-linear behaviour of the ANN model, where feature effects vary depending 
+            on interactions with other variables.
+            """
+        )
+
+        # -------------------
+        # Local Explanation
+        # -------------------
+        st.markdown("### Local Explanation (Single Prediction)")
+
+        img_local = "outputs/SHAP_regression/reg_waterfall_plot_shap.png"
+
+        col1, col2, col3 = st.columns([1, 3, 1])
+        with col2:
+            if os.path.exists(img_local):
+                st.image(img_local, width=IMAGE_WIDTH)
+            else:
+                st.warning("Local SHAP waterfall plot image not found.")
+
+        st.markdown(
+            """
+            This figure shows a local SHAP explanation for a single prediction generated 
+            by the ANN regression model. The explanation starts from the base value, which 
+            represents the average predicted suicide rate across the dataset, and shows 
+            how individual feature contributions combine to produce the final predicted 
+            value of approximately **21.38 suicides per 100,000 population**.
+
+            Features shown in red increase the predicted value, while blue features reduce 
+            it. For this instance, variables related to thinness among children, economic 
+            indicators, and schooling contributed to an increase in the prediction, whereas 
+            life expectancy and adult mortality acted as strong mitigating factors. This 
+            local explanation demonstrates how the ANN model balances multiple socio-economic 
+            and health-related variables to arrive at its final prediction.
+            """
+        )
+
+
 
 # ----------
 # Clustering
