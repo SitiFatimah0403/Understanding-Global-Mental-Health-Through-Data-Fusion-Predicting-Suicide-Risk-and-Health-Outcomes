@@ -117,6 +117,15 @@ if section == "Introduction":
             """
         ) 
 
+        st.markdown(
+            """
+            **Target Variables:**  
+            - Classification: Suicide risk category  
+            - Regression: Suicide rate per 100,000 population
+            """
+        )
+
+
         fcol1, fcol2, fcol3 = st.columns(3)
 
         with fcol1:
@@ -177,6 +186,17 @@ if section == "Introduction":
             - Hierarchical Clustering
             """
         )
+
+        st.info(
+                     """
+                    **Evaluation Metrics:**  
+                    - Classification: Accuracy, Precision, Recall, F1-score  
+                    - Regression: RMSE, MAE  
+                    - Clustering: Silhouette Score
+                    """
+                )
+
+
 
     # -----------------
     # RIGHT COLUMN
@@ -656,10 +676,19 @@ elif section == "Regression":
         # TAB 3: AUTOML
         # -------------------
         with tabs[2]:
-                st.subheader("AutoML vs Manual Modeling")
+                st.subheader("Modeling using AutoML")
 
                 fused_automl_df = pd.read_csv("outputs/fused_reg_automl.csv")
                 st.dataframe(fused_automl_df, use_container_width=True)
+
+                st.subheader("AutoML vs Manual Modeling")
+
+                st.markdown(
+                            """
+                        To further evaluate the effectiveness of manual model development, the best tuned regression model
+                        was compared against the best-performing AutoML model using RMSE.
+                        """
+                        )
 
                 fused_automl_df = pd.read_csv("outputs/reg_manual_automl_compare.csv")
                 st.dataframe(fused_automl_df, use_container_width=True)
