@@ -238,11 +238,20 @@ elif section == "Classification":
         col1, col2 = st.columns(2)
 
         with col1:
+            st.markdown("**Scaled (80-20)**")
+            df_s_80 = pd.read_csv("outputs/scaled_fused_cls_80_20.csv")
+            st.dataframe(df_s_80, use_container_width=True)
+
+            st.markdown("**Scaled (70-30)**")
+            df_s_70 = pd.read_csv("outputs/scaled_fused_cls_70_30.csv")
+            st.dataframe(df_s_70, use_container_width=True)
+
+
+        with col2:
             st.markdown("**No Scaling (80–20)**")
             df_ns_80 = pd.read_csv("outputs/nonscaled_fused_cls_baseline_80_20.csv")
             st.dataframe(df_ns_80, use_container_width=True)
 
-        with col2:
             st.markdown("**No Scaling (70–30)**")
             df_ns_70 = pd.read_csv("outputs/nonscaled_fused_cls_baseline_70_30.csv")
             st.dataframe(df_ns_70, use_container_width=True)
